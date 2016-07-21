@@ -102,6 +102,46 @@
 What happens here is that both guess and sqrt-iter are evaluated before being
 passed to new-if, because new-if is not a special form (even though it contains
 cond). As a result, sqrt-iter ends up being called infinitely.
-#|
+|#
+
 
 ;; Exercise 1.7
+
+;; The good-enough? test used in computing square roots will not be very
+;; effective for finding the square roots of very small numbers.
+;; => This is because we have hard-coded a "good enough?" value that has a fixed
+;; number of significant digits. If we were to try to find the square root of
+;; something with the same number of significant digits, any number on the same
+;; order of magnitude would suffice
+
+;; Also, in real computers, arithmetic operations are almost always performed
+;; with limited precision. This makes our test inadequate for very large
+;; numbers.
+;; => This is because at some point the precision will overtake the integer
+;; size. 
+
+(define (good-enough? guess x)
+  (< (abs (- (square guess) (square (improve guess x)))) 0.001))
+
+;; This works well for very large numbers but not for small ones.
+
+;; Exercise 1.8
+
+(define (improve-cr guess x)
+  (/ (+ (/ x (* guess guess)) (* 2 guess)) 3))
+
+(define (cube x)
+  (* x x x))
+
+(define (good-enough-cr? guess x)
+  (< (abs (- (cube guess) x)) 0.001))
+
+(define (crt-iter guess x)
+  (if (good-enough-cr? guess x)
+    guess
+    (crt-iter (improve-cr guess x) x)))
+
+(define (crt x)
+  (crt-iter 1.0 x))
+
+;; 1.1.8: Procedures as Black-Box Abstractions
